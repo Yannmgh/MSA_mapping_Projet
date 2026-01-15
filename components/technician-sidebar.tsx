@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,17 +12,19 @@ import type { Mission } from "@/types"
 // Custom SVG components
 const MapPinIcon = () => (
   <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+    />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
   </svg>
 )
 
 const ClockIcon = () => (
   <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 )
 
@@ -39,6 +42,7 @@ const SendIcon = () => (
 )
 
 export function TechnicianSidebar() {
+  const router = useRouter()
   const [missions, setMissions] = useState<Mission[]>([])
   const [filteredMissions, setFilteredMissions] = useState<Mission[]>([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -83,31 +87,23 @@ export function TechnicianSidebar() {
     setFilteredMissions(filtered)
   }
 
-  const handleApply = async (missionId: string) => {
-    try {
-      const response = await fetch(`/api/missions/${missionId}/apply`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ technicianId: "current-user" }), // Mock user ID
-      })
-
-      if (response.ok) {
-        alert("Candidature envoyée avec succès!")
-        loadAvailableMissions() // refresh
-      }
-    } catch (error) {
-      console.error("Error applying to mission:", error)
-      alert("Erreur lors de l'envoi de la candidature")
-    }
+  // 🧭 Nouvelle version : redirige vers la page descriptive
+  const handleApply = (missionId: string) => {
+    router.push(`/missions/${missionId}`)
   }
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "mechanic": return "🔧"
-      case "bodywork": return "🚗"
-      case "reception": return "👥"
-      case "maintenance": return "⚙️"
-      default: return "📋"
+      case "mechanic":
+        return "🔧"
+      case "bodywork":
+        return "🚗"
+      case "reception":
+        return "👥"
+      case "maintenance":
+        return "⚙️"
+      default:
+        return "📋"
     }
   }
 
@@ -184,6 +180,7 @@ export function TechnicianSidebar() {
                 )}
               </div>
 
+              {/* 🔗 Redirection vers la page descriptive */}
               <Button onClick={() => handleApply(mission.id)} className="w-full msa-button-primary text-sm py-2">
                 <SendIcon />
                 Postuler
